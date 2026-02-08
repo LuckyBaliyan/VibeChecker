@@ -7,7 +7,7 @@ const App = () => {
     <div>
       <h1 className='text-2xl text-purple-600 
       font-extrabold'>
-        Day01
+        Day02
       </h1>
       <button onClick={()=>fetchAssets('cat')}>
         Get Assets
