@@ -5,7 +5,7 @@ const ResultCard = () => {
   const [gifs,setGifs] = useState([]);
 
   const  loadItems = async ()=>{
-    const data = await fetchGifs('cat',20);
+    const data = await fetchGifs('Anime',20);
     setGifs(data);
   };
 
@@ -19,8 +19,8 @@ const ResultCard = () => {
   return (
     <div>
         <video
-            key={gifs[1]?.id}
-            src={gifs[1]?.images?.original?.mp4}
+            src={gifs[10]?.images?.original?.mp4}
+            key={gifs[10]?.id}
             muted
             autoPlay
             loop
