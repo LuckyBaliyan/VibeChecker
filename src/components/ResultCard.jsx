@@ -3,10 +3,25 @@ import Button from './Button';
 
 const heightVariants = ['h-56', 'h-64', 'h-72', 'h-80', 'h-[22rem]', 'h-[26rem]'];
 
-const ResultCard = ({ elem, index }) => {
+const ResultCard = ({ elem, index, isLoading = false }) => {
   const mediaHeight = heightVariants[index % heightVariants.length];
   const isVideo = elem.type === 'video';
   const isGifMp4 = elem.type === 'gif' && elem.src?.includes('.mp4');
+
+  if (isLoading) {
+    return (
+      <article className='relative mb-3 break-inside-avoid overflow-hidden rounded border border-zinc-800 bg-zinc-900/80 shadow-lg shadow-black/20 sm:mb-5'>
+        <div className={`card-skeleton-glow w-full ${mediaHeight} bg-zinc-800`} />
+        <div className='flex items-center justify-between gap-2 p-3'>
+          <div className='flex-1'>
+            <div className='card-skeleton-glow mb-2 h-3 w-3/4 rounded bg-zinc-800' />
+            <div className='card-skeleton-glow h-2 w-1/3 rounded bg-zinc-800' />
+          </div>
+          <div className='card-skeleton-glow h-8 w-14 rounded-md bg-zinc-800' />
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className='group relative mb-3 break-inside-avoid overflow-hidden rounded border bg-zinc-900/80 shadow-lg shadow-black/20 sm:mb-5'>
@@ -30,11 +45,11 @@ const ResultCard = ({ elem, index }) => {
           />
         )}
 
-        <div className='absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/80 via-black/35 to-black/20 p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+        <div className='absolute inset-0 flex flex-col justify-between from-black/80 via-black/35 to-black/20 p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
           <div className='flex items-start justify-between gap-2'>
             <div>
-              <p className='line-clamp-1 text-sm font-semibold text-white'>{elem.title}</p>
-              <p className='text-[10px] uppercase tracking-wide text-zinc-300'>{elem.type}</p>
+              <p className='line-clamp-2 leading-4 text-sm font-semibold text-white capitalize mix-blend-difference'>{elem.title}</p>
+              <p className='text-[10px] uppercase tracking-wide text-white bg-zinc-900 py-1 px-2 mt-2 rounded-full w-fit'>{elem.type}</p>
             </div>
             <Button text='Save' className='px-3 py-1.5 text-xs font-semibold' />
           </div>
