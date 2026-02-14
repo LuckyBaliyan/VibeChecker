@@ -1,26 +1,16 @@
 import React from 'react'
 import {fetchAssets,fetchGifs, fetchVideos} from './api/mediaApi';
 import ResultCard from './components/ResultCard';
+import SearchBar from './components/SearchBar';
+import Tabs from './components/Tabs';
+import ResultGrid from './components/ResultGrid';
 
 const App = () => {
   return (
     <div>
-      <h1 className='text-2xl text-purple-600 
-      font-extrabold'>
-        Day02
-      </h1>
-      <button onClick={()=>fetchAssets('cat')}>
-        Get Assets
-      </button>
-      <br />
-      <button onClick={()=>fetchGifs('cat')}>
-        Get GIFS
-      </button>
-      <br />
-      <button onClick={()=>fetchVideos('cat')}>
-        Get Videos
-      </button>
-      <ResultCard />
+      <SearchBar />
+      <Tabs />
+      <ResultGrid />
     </div>
   )
 }
