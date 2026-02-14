@@ -45,7 +45,7 @@ const normalizeVideo = (item) => {
   };
 };
 
-export async function fetchAssets(query = '', page = 1, per_page = 20) {
+export async function fetchAssets(query = '', page = 1, per_page = 50) {
   try {
     const res = await axios.get('https://api.unsplash.com/search/photos', {
       params: { query, page, per_page },
@@ -59,7 +59,7 @@ export async function fetchAssets(query = '', page = 1, per_page = 20) {
   }
 }
 
-export async function fetchGifs(query = '', limit = 10) {
+export async function fetchGifs(query = '', limit = 50) {
   try {
     const res = await axios.get('https://api.giphy.com/v1/gifs/search', {
       params: {
@@ -76,7 +76,7 @@ export async function fetchGifs(query = '', limit = 10) {
   }
 }
 
-export async function fetchVideos(query = '', per_page = 15) {
+export async function fetchVideos(query = '', per_page = 25) {
   try {
     const res = await axios.get('https://api.pexels.com/videos/search', {
       params: { query, per_page },
