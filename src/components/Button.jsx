@@ -1,13 +1,28 @@
 import React from 'react';
 
-const Button = ({ text, type = 'button', className = '', ...props }) => {
+const variantClasses = {
+  default: 'bg-white text-black border border-white hover:opacity-90',
+  cyber: 'btn-cyber',
+  ghostCyber: 'btn-ghost-cyber',
+};
+
+const Button = ({
+  text,
+  type = 'button',
+  className = '',
+  variant = 'default',
+  children,
+  ...props
+}) => {
+  const resolvedVariant = variantClasses[variant] || variantClasses.default;
+
   return (
     <button
       type={type}
-      className={`bg-white text-black rounded px-4 py-2 cursor-pointer ${className}`}
+      className={`inline-flex items-center justify-center rounded px-4 py-2 text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-200 cursor-pointer ${resolvedVariant} ${className}`}
       {...props}
     >
-      {text}
+      {children || text}
     </button>
   );
 };

@@ -45,14 +45,16 @@ const normalizeVideo = (item) => {
   };
 };
 
-export async function fetchAssets(query = '', page = 1, per_page = 50) {
+export async function fetchAssets(query = '', page = 1, per_page = 30) {
   try {
     const res = await axios.get('https://api.unsplash.com/search/photos', {
       params: { query, page, per_page },
       headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` },
     });
 
-    return (res.data?.results || []).map(normalizePhoto);
+    const data =  (res.data?.results || []).map(normalizePhoto);
+
+    return data;
   } catch (error) {
     console.log(error.response?.data || error.message);
     return [];

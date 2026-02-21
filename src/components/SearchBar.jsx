@@ -10,7 +10,6 @@ const SearchBar = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(setQuery(search));
-    setSearch('');
   };
 
   return (
@@ -19,7 +18,7 @@ const SearchBar = () => {
         <input
           required
           onChange={(e) => setSearch(e.target.value)}
-          className='w-full p-1.5 rounded borde px-2  bg-zinc-500 text-zinc-900 outline-none 
+          className='w-full p-1.5 rounded border px-2  bg-zinc-500 text-zinc-900 outline-none 
           placeholder:text-zinc-60'
           type='text'
           value={search}

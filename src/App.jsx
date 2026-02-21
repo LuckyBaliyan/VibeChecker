@@ -1,18 +1,23 @@
 import React from 'react';
-import SearchBar from './components/SearchBar';
-import Tabs from './components/Tabs';
-import ResultGrid from './components/ResultGrid';
 import useLenis from './hooks/useLenis';
+import Browse from './pages/Browse';
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import CardNav from './components/CardNav';
 
 const App = () => {
   useLenis();
 
   return (
-    <div>
-      <SearchBar />
-      <Tabs />
-      <ResultGrid />
-    </div>
+    <main>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/browse' element={<Browse />} />
+      </Routes>
+      <div className='fixed bottom-10 left-0 z-50 flex w-full items-center justify-center'>
+        <CardNav />
+      </div>
+    </main>
   );
 };
 
