@@ -4,6 +4,7 @@ import { setLoading, setError, setResults, clearResults, setQuery, setActiveTab 
 import { useDispatch, useSelector } from 'react-redux';
 import ResultCard from './ResultCard';
 import Button from './Button';
+import { skel } from '../hooks/handleRender';
 
 const tabs = [
   { label: 'IMGES', value: 'photos' },
@@ -29,6 +30,11 @@ const ResultGrid = () => {
   const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState(query);
   const requestRef = useRef(0);
+
+  //Optimiszed rendering fetaure 
+  useEffect(()=>{
+    skel();
+  },[results]);
 
   useEffect(() => {
     setSearchValue(query);

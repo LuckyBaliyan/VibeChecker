@@ -12,17 +12,17 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
     localStorage.setItem('collections', JSON.stringify(newData));
   };
 
-  if (isLoading) {
+  /*if (isLoading) {
     return (
       <article className='mb-4 break-inside-avoid overflow-hidden bg-black/60 sm:mb-5 lg:mb-6'>
         <div className={`card-skeleton-glow w-full ${heightClass} bg-zinc-800/80`} />
       </article>
     );
-  }
+  }*/
 
   return (
-    <article className='group relative mb-4 break-inside-avoid overflow-hidden bg-black sm:mb-5 lg:mb-6'>
-      <div className={`relative w-full ${heightClass} bg-black`}>
+    <article className='group relative mb-4 break-inside-avoid overflow-hidden sm:mb-5 lg:mb-6'>
+      <div className={`relative w-full ${heightClass} blur-load`}>
         {isVideo || isGifMp4 ? (
           <video
             src={elem.src}
