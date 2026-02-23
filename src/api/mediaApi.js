@@ -61,9 +61,9 @@ export async function fetchAssets(query = '', page = 1, per_page = 30) {
   }
 }
 
-export async function fetchGifs(query = '', limit = 50) {
+export async function fetchGifs(query = '', limit = 30) {
   try {
-    const res = await axios.get('https://api.giphy.com/v1/gifs/search', {
+    const res = await axios.get('/giphy/v1/gifs/search', {
       params: {
         q: query,
         api_key: GIPHY_KEY,

@@ -12,6 +12,9 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
     localStorage.setItem('collections', JSON.stringify(newData));
   };
 
+  // This might work good but to inhance user experience to a very convenient level i have
+  // decided to use a placeHolder image of small size until we load the final image
+
   /*if (isLoading) {
     return (
       <article className='mb-4 break-inside-avoid overflow-hidden bg-black/60 sm:mb-5 lg:mb-6'>

@@ -356,11 +356,28 @@ body {
 /* Handling optimistic images preloading */
 
 .blur-load{
-  background-image: url('/public/placeHolder.jpg');
+  background-image: url('/PlaceHolder-1.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+/*.blur-load:nth-child(n + 1) {
+  background-image: url('/PlaceHolder-3.jpg');
+}
+
+.blur-load:nth-child(n + 2) {
+  background-image: url('/PlaceHolder-2.jpg');
+}
+
+.blur-load:nth-child(n + 3) {
+  background-image: url('/PlaceHolder-4.jpg');
+}
+
+.blur-load:nth-child(n + 4) {
+  background-image: url('/PlaceHolder-1.jpg');
+}
+*/
 
 .blur-load::before{
   content: "";
@@ -397,3 +414,5 @@ body {
   opacity: 0;
   transition: opacity 200ms ease-in-out;
 }
+
+

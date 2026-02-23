@@ -1,6 +1,7 @@
 export const skel = () => {
   const blurDivs = document.querySelectorAll('.blur-load');
 
+
   blurDivs.forEach(div => {
     const img = div.querySelector("img");
     const video = div.querySelector("video");

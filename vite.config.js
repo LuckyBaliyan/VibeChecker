@@ -7,4 +7,14 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss()
   ],
+  server: {
+    proxy: {
+      '/giphy': {
+        target: 'https://api.giphy.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/giphy/, '')
+      }
+    }
+  }
 })
