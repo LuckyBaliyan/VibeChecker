@@ -1,7 +1,7 @@
 import React from 'react';
 
 const variantClasses = {
-  default: 'bg-white text-black border border-white hover:opacity-90',
+  default: 'text-black',
   cyber: 'btn-cyber',
   ghostCyber: 'btn-ghost-cyber',
 };
