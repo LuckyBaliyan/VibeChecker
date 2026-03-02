@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { FiArrowRight, FiBookmark, FiCompass, FiFolder, FiGithub, FiHeart } from 'react-icons/fi';
-import { LuSparkles } from 'react-icons/lu';
+import { AiFillThunderbolt } from 'react-icons/ai';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Home = () => {
     <section className='pinspire-home'>
       <div className='pinspire-shell'>
         <div className='pinspire-badge'>
-          <LuSparkles />
+          <AiFillThunderbolt />
         </div>
         <h1 className='pinspire-title'>
           <span className='uppercase'>Vibe Vault</span>

@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import ResultCard from './ResultCard';
 import Button from './Button';
 import { skel } from '../hooks/handleRender';
-import { FiMoon, FiSun, FiUser } from 'react-icons/fi';
+import { FiUser } from 'react-icons/fi';
+import { AiFillThunderbolt } from 'react-icons/ai';
 
 const tabs = [
   { label: 'IMAGES', value: 'photos' },
@@ -46,7 +47,7 @@ const ResultGrid = () => {
   const { query, activeTab, results, loading, error } = useSelector((store) => store.search);
   const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState(query);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('themeMode') === 'dark');
   const requestRef = useRef(0);
 
   //Optimiszed rendering fetaure 
@@ -57,6 +58,21 @@ const ResultGrid = () => {
   useEffect(() => {
     setSearchValue(query);
   }, [query]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncThemeFromRoot = () => {
+      const isDarkMode = root.getAttribute('data-theme') === 'dark';
+      setIsDark(isDarkMode);
+    };
+
+    syncThemeFromRoot();
+
+    const observer = new MutationObserver(syncThemeFromRoot);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,7 +135,7 @@ const ResultGrid = () => {
           <div className='flex items-center gap-3 py-3'>
             <div className='flex  items-center gap-2'>
               <div className='flex h-9 w-9 items-center justify-center rounded-full bg-[#ef3f73] text-sm font-bold text-white'>
-                V
+                <AiFillThunderbolt className='h-4 w-4' />
               </div>
               <p className={`text-lg font-semibold ${isDark ? 'text-zinc-100' : 'text-[#171a24]'}`}>VibeVault</p>
             </div>
@@ -148,19 +164,6 @@ const ResultGrid = () => {
             </form>
 
             <div className='flex items-center gap-2'>
-              <button
-                type='button'
-                onClick={() => setIsDark((prev) => !prev)}
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
-                  isDark
-                    ? 'border-[#2a3042] bg-[#1a2030] text-[#ef7ca0] hover:border-[#ef3f73]'
-                    : 'border-[#e2e2e6] bg-white text-[#1b1b1f] hover:border-[#ef3f73] hover:text-[#ef3f73]'
-                }`}
-                aria-label='Toggle theme'
-              >
-                {isDark ? <FiSun className='h-4 w-4' /> : <FiMoon className='h-4 w-4' />}
-              </button>
-
               <button
                 type='button'
                 className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e9d4dc] bg-[#ffeef3] text-[#ef3f73]'

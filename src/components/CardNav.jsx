@@ -2,8 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { GoArrowUpRight } from 'react-icons/go';
 import { AiFillThunderbolt } from 'react-icons/ai';
-
-const accentModes = ['mint', 'cyan', 'magenta', 'violet'];
+import { FiMoon, FiSun } from 'react-icons/fi';
 
 const CardNav = () => {
   const items = [
@@ -36,30 +35,44 @@ const CardNav = () => {
 
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [accentIndex, setAccentIndex] = useState(0);
+  const [isDarkTheme, setIsDarkTheme] = useState(() => localStorage.getItem('themeMode') === 'dark');
 
   const navRef = useRef(null);
   const cardsRef = useRef([]);
   const tlRef = useRef(null);
 
-  const applyAccent = (index) => {
-    const mode = accentModes[index % accentModes.length];
-    document.documentElement.setAttribute('data-accent', mode);
-    localStorage.setItem('accentMode', mode);
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', mode);
+    localStorage.setItem('themeMode', mode);
+    setIsDarkTheme(mode === 'dark');
   };
 
   useEffect(() => {
-    const savedMode = localStorage.getItem('accentMode');
-    const initialIndex = accentModes.indexOf(savedMode);
-    const resolvedIndex = initialIndex >= 0 ? initialIndex : 0;
-    setAccentIndex(resolvedIndex);
-    applyAccent(resolvedIndex);
+    const savedTheme = localStorage.getItem('themeMode');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      applyTheme(savedTheme);
+      return;
+    }
+
+    applyTheme('light');
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const updateTheme = () => {
+      setIsDarkTheme(root.getAttribute('data-theme') === 'dark');
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => observer.disconnect();
   }, []);
 
   const handleChangeVibe = () => {
-    const nextIndex = (accentIndex + 1) % accentModes.length;
-    setAccentIndex(nextIndex);
-    applyAccent(nextIndex);
+    applyTheme(isDarkTheme ? 'light' : 'dark');
   };
 
   const calculateHeight = () => {
@@ -156,7 +169,7 @@ const CardNav = () => {
 
   return (
     <div className='card-nav-container'>
-      <nav ref={navRef} className={`card-nav ${isExpanded ? 'open' : ''}`}>
+      <nav ref={navRef} className={`card-nav ${isExpanded ? 'open' : ''} ${isDarkTheme ? 'card-nav-dark' : 'card-nav-light'}`}>
         <div className='card-nav-top'>
           <div
             className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''}`}
@@ -176,7 +189,8 @@ const CardNav = () => {
           </div>
 
           <button type='button' className='card-nav-cta-button' onClick={handleChangeVibe}>
-            Change The Vibe
+            {isDarkTheme ? <FiSun className='card-nav-cta-icon' /> : <FiMoon className='card-nav-cta-icon' />}
+            {isDarkTheme ? 'Light Theme' : 'Dark Theme'}
           </button>
         </div>
 

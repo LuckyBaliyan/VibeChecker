@@ -1,39 +1,21 @@
 import React, { useMemo, useState } from 'react';
 import Button from './Button';
-import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
+import { useNavigate } from 'react-router-dom';
 
 const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
+  const navigate = useNavigate();
   const isVideo = elem.type === 'video';
   const isGifMp4 = elem.type === 'gif' && elem.src?.includes('.mp4');
   const mediaTypeLabel = elem.type === 'photo' ? 'img' : elem.type || 'img';
   const loadingClass = isLoading ? 'animate-pulse' : '';
-  const likeKey = useMemo(
-    () => `${elem.id || ''}-${elem.src || ''}-${elem.thumbnail || ''}-${elem.title || ''}`,
-    [elem.id, elem.src, elem.thumbnail, elem.title]
-  );
-  const [isLiked, setIsLiked] = useState(() => {
-    if (!likeKey || likeKey === '---') return false;
-    const likedItems = JSON.parse(localStorage.getItem('likedItems')) || [];
-    return likedItems.includes(likeKey);
-  });
 
   const addToCollection = (item) => {
     const oldData = JSON.parse(localStorage.getItem('collections')) || [];
-    const newData = [...oldData, item];
+    const isDuplicate = oldData.some(
+      (collectionItem) => collectionItem?.id === item?.id && collectionItem?.src === item?.src
+    );
+    const newData = isDuplicate ? oldData : [...oldData, item];
     localStorage.setItem('collections', JSON.stringify(newData));
-  };
-
-  const toggleLike = () => {
-    if (!likeKey || likeKey === '---') return;
-
-    const likedItems = JSON.parse(localStorage.getItem('likedItems')) || [];
-    const nextLiked = !isLiked;
-    const nextItems = nextLiked
-      ? [...likedItems, likeKey]
-      : likedItems.filter((key) => key !== likeKey);
-
-    localStorage.setItem('likedItems', JSON.stringify(nextItems));
-    setIsLiked(nextLiked);
   };
 
   // This might work good but to inhance user experience to a very convenient level i have
@@ -49,8 +31,21 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
 
   return (
     <article
+      onClick={() =>
+        !isLoading &&
+        navigate(`/media/${encodeURIComponent(elem.id || 'preview')}`, { state: { item: elem } })
+      }
+      onKeyDown={(e) => {
+        if (isLoading) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/media/${encodeURIComponent(elem.id || 'preview')}`, { state: { item: elem } });
+        }
+      }}
+      role='button'
+      tabIndex={isLoading ? -1 : 0}
       className={`group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl bg-white 
-        shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_26px_rgba(239,63,115,0.16)] sm:mb-5 lg:mb-6 ${loadingClass}`}
+        shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_26px_rgba(239,63,115,0.16)] sm:mb-5 lg:mb-6 ${loadingClass} ${isLoading ? '' : 'cursor-pointer'}`}
     >
       <div className={`relative w-full overflow-hidden rounded-2xl ${heightClass} blur-load`}>
         {isVideo || isGifMp4 ? (
@@ -76,15 +71,6 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
         )}
 
         <div className='absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-        <button
-          type='button'
-          onClick={toggleLike}
-          className={`absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center transition-colors`}
-          aria-label={isLiked ? 'Unlike card' : 'Like card'}
-        >
-          {!isLiked ? <HiHeart className='h-8 w-8 fill-zinc-50' /> : <HiOutlineHeart className='h-8 w-8 fill-[#ef3f73] border-0
-          outline-0 ring-0' />}
-        </button>
           <div className='absolute left-3 top-3 max-w-[72%]'>
             <p className='line-clamp-2 text-lg font-semibold leading-tight text-white  capitalize'>
               {elem.title || 'Untitled'}
@@ -100,13 +86,17 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
               <Button
                 text='Save'
                 className='pointer-events-auto rounded-full border border-[#ef3f73] bg-[#ef3f73] px-3 py-1.5 text-[10px] tracking-[0.08em] text-white hover:bg-transparent hover:text-[#ef3f73]'
-                onClick={() => addToCollection(elem)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCollection(elem);
+                }}
               />
 
               <a
                 href={elem.src}
                 target='_blank'
                 rel='noreferrer'
+                onClick={(e) => e.stopPropagation()}
                 className='pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#ef3f73] text-white bg-[#ef3f73]'
                 aria-label={isVideo ? 'Download video' : 'Open media source'}
               >

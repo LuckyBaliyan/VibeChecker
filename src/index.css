@@ -177,11 +177,66 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
+  display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
 }
 
 .card-nav-cta-button:hover {
   background-color: #d93667 !important;
+  color: #fff !important;
+}
+
+.card-nav-cta-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.card-nav-dark {
+  background-color: #101520 !important;
+  border-color: #2a3042 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+.card-nav-dark .card-nav-top {
+  border-bottom-color: #2a3042;
+}
+
+.card-nav-dark .hamburger-menu {
+  color: #e8ebf5 !important;
+}
+
+.card-nav-dark .nav-card {
+  background-color: #151b28 !important;
+  color: #e8ebf5 !important;
+  border-color: #2a3042;
+}
+
+.card-nav-dark .nav-card-label {
+  color: #f3f5fb !important;
+}
+
+.card-nav-dark .nav-card-link {
+  color: #b5bccf !important;
+}
+
+.card-nav-dark .nav-card-link-icon {
+  color: #ef7ca0 !important;
+}
+
+.card-nav-dark .nav-card-link:hover {
+  color: #ef7ca0 !important;
+}
+
+.card-nav-dark .card-nav-cta-button {
+  background-color: #1b2233 !important;
+  border-color: #2a3042;
+  color: #e8ebf5 !important;
+}
+
+.card-nav-dark .card-nav-cta-button:hover {
+  background-color: #ef3f73 !important;
+  border-color: #ef3f73;
   color: #fff !important;
 }
 
@@ -285,7 +340,10 @@ body {
   }
 
   .card-nav-cta-button {
-    display: none;
+    display: inline-flex;
+    height: 38px;
+    padding: 0 0.85rem;
+    font-size: 11px;
   }
 
   .card-nav-content {

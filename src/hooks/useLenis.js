@@ -1,8 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
+import { useLocation } from 'react-router-dom';
 import 'lenis/dist/lenis.css';
 
 const useLenis = () => {
+  const lenisRef = useRef(null);
+  const location = useLocation();
+
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -14,6 +18,7 @@ const useLenis = () => {
       syncTouch: false,
       lerp: reduceMotion ? 1 : 0.1,
     });
+    lenisRef.current = lenis;
 
     let rafId = 0;
 
@@ -27,8 +32,17 @@ const useLenis = () => {
     return () => {
       window.cancelAnimationFrame(rafId);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: false });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [location.pathname]);
 };
 
 export default useLenis;
