@@ -13,6 +13,7 @@ const tabs = [
   { label: 'GIFS', value: 'gifs' },
   { label: 'VIDEOS', value: 'videos' },
 ];
+const quickTopics = ['Nature', 'Cyberpunk', 'Cars', 'Anime', 'Space', 'Fitness'];
 
 const bentoHeights = [
   'h-[190px]',
@@ -121,6 +122,11 @@ const ResultGrid = () => {
     dispatch(setQuery(searchValue.trim()));
   };
 
+  const handleQuickSearch = (topic) => {
+    setSearchValue(topic);
+    dispatch(setQuery(topic));
+  };
+
   const hasQuery = query.trim().length > 0;
   const pageBgClass = isDark ? 'bg-[#0f1219]' : 'bg-[#f0f0f3]';
   const layerBgClass = isDark ? 'bg-[#0f1219]/95 border-[#222736]' : 'bg-[#f0f0f3]/95 border-[#e8e8ee]';
@@ -208,22 +214,47 @@ const ResultGrid = () => {
           )}
 
           {!loading && !error && !hasQuery && (
-            <p className={`mt-8 text-center text-sm ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>Search for a topic to load media.</p>
+            <div className={`mx-auto mt-10 max-w-2xl rounded-2xl border p-6 text-center ${isDark ? 'border-[#2a3042] bg-[#141a27]' : 'border-[#e3e4eb] bg-white'}`}>
+              <p className={`text-sm font-medium ${isDark ? 'text-zinc-300' : 'text-[#4d5568]'}`}>
+                Start with a topic to load media.
+              </p>
+              <p className={`mt-2 text-xs ${isDark ? 'text-zinc-500' : 'text-[#8a90a0]'}`}>
+                Try quick picks:
+              </p>
+              <div className='mt-4 flex flex-wrap items-center justify-center gap-2'>
+                {quickTopics.map((topic) => (
+                  <button
+                    key={topic}
+                    type='button'
+                    onClick={() => handleQuickSearch(topic)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      isDark
+                        ? 'border-[#323a4d] bg-[#1a2030] text-zinc-200 hover:border-[#ef3f73] hover:text-[#ef7ca0]'
+                        : 'border-[#d9dce7] bg-[#f7f8fc] text-[#4d5568] hover:border-[#ef3f73] hover:text-[#ef3f73]'
+                    }`}
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {!loading && !error && hasQuery && results.length === 0 && (
             <p className={`mt-8 text-center text-sm ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>No results found for this query.</p>
           )}
 
-          <div className='mt-11 columns-1 gap-4 space-y-4 sm:columns-2 sm:gap-5 sm:space-y-5 lg:columns-4 lg:gap-6 lg:space-y-6'>
-            {loading
-              ? Array.from({ length: 12 }).map((_, i) => (
-                  <ResultCard key={`skeleton-${i}`} elem={{}} isLoading heightClass={getHeightClass(i)} />
-                ))
-              : results.map((res, i) => (
-                  <ResultCard elem={res} isLoading={false} key={res.id || i} heightClass={getHeightClass(i, res)} />
-                ))}
-          </div>
+          {(loading || hasQuery) && (
+            <div className='mt-11 columns-1 gap-4 space-y-4 sm:columns-2 sm:gap-5 sm:space-y-5 lg:columns-4 lg:gap-6 lg:space-y-6'>
+              {loading
+                ? Array.from({ length: 12 }).map((_, i) => (
+                    <ResultCard key={`skeleton-${i}`} elem={{}} isLoading heightClass={getHeightClass(i)} />
+                  ))
+                : results.map((res, i) => (
+                    <ResultCard elem={res} isLoading={false} key={res.id || i} heightClass={getHeightClass(i, res)} />
+                  ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

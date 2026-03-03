@@ -6,7 +6,9 @@ import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { FiExternalLink, FiLink2, FiShare2 } from 'react-icons/fi';
 import { AiFillThunderbolt } from 'react-icons/ai';
 import { toggleLikes } from '../redux/features/likeSlice';
+import { addCollection } from '../redux/features/collectionSlice';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
 
 const MediaDetail = () => {
@@ -45,7 +47,7 @@ const MediaDetail = () => {
   }, [currentItem]);
 
   useEffect(() => {
-    if (currentItem?.type) setRelatedType(currentItem.type);
+    if (currentItem) setRelatedType(getMediaKind(currentItem));
   }, [currentItem]);
 
   useEffect(() => {
@@ -68,25 +70,58 @@ const MediaDetail = () => {
     return () => observer.disconnect();
   }, []);
 
+  const collectionItems = useSelector((state) => state.collections.items);
+  const likedItems = useSelector((state)=>state.like.likedItems);
+
+  const getMediaKind = (item) => {
+    const type = String(item?.type || '').toLowerCase();
+    const src = String(item?.src || item?.thumbnail || '').toLowerCase();
+
+    if (type === 'gif') return 'gif';
+    if (type === 'video') return 'video';
+    if (type === 'photo' || type === 'image') return 'photo';
+    if (src.includes('.gif')) return 'gif';
+    if (src.includes('.mp4') || src.includes('.webm') || src.includes('.mov')) return 'video';
+    return 'photo';
+  };
+
+  const relatedPool = useMemo(() => {
+    const merged = [...(results || []), ...(collectionItems || []), ...(likedItems || [])];
+    const uniqueMap = new Map();
+
+    merged.forEach((item) => {
+      const key = `${String(item?.id || '')}-${String(item?.src || '')}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, item);
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [results, collectionItems, likedItems]);
+
   const relatedContent = useMemo(() => {
     if (!currentItem) return [];
 
-    return (results || [])
-      .filter((item) => item?.type === relatedType)
+    return relatedPool
+      .filter((item) => getMediaKind(item) === relatedType)
       .filter((item) => !(String(item?.id) === String(currentItem.id) && item?.src === currentItem.src))
       .slice(0, 8);
-  }, [currentItem, relatedType, results]);
+  }, [currentItem, relatedType, relatedPool]);
 
   const addToCollection = () => {
     if (!currentItem) return;
-    const oldData = JSON.parse(localStorage.getItem('collections')) || [];
-    const isDuplicate = oldData.some(
+    const isDuplicate = (collectionItems || []).some(
       (collectionItem) =>
         String(collectionItem?.id) === String(currentItem?.id) && collectionItem?.src === currentItem?.src
     );
-    const newData = isDuplicate ? oldData : [...oldData, currentItem];
-    localStorage.setItem('collections', JSON.stringify(newData));
-    setFeedbackText(isDuplicate ? 'Already in collection' : 'Added to collection');
+
+    if (isDuplicate) {
+      toast.warning('Already in collection');
+      return;
+    }
+
+    dispatch(addCollection(currentItem));
+    toast.success('Added to collection');
   };
 
   const handleShare = async () => {
@@ -136,11 +171,10 @@ const MediaDetail = () => {
     );
   }
 
-  const isVideo = currentItem.type === 'video';
-  const isGifMp4 = currentItem.type === 'gif' && currentItem.src?.includes('.mp4');
+  const mediaKind = getMediaKind(currentItem);
+  const isVideo = mediaKind === 'video';
+  const isGifMp4 = mediaKind === 'gif' && currentItem.src?.includes('.mp4');
   const previewSrc = currentItem.thumbnail || currentItem.src;
-
-  const likedItems = useSelector((state)=>state.like.likedItems);
   const isLiked = likedItems.some(
     (item)=> String(item.id) === String(currentItem?.id)
   );

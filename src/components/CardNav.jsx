@@ -3,30 +3,30 @@ import { gsap } from 'gsap';
 import { GoArrowUpRight } from 'react-icons/go';
 import { AiFillThunderbolt } from 'react-icons/ai';
 import { FiMoon, FiSun } from 'react-icons/fi';
+import { NavLink } from 'react-router-dom';
 
 const CardNav = () => {
   const items = [
     {
       label: 'Navigation',
       links: [
-        { label: 'Home', ariaLabel: 'Home' },
-        { label: 'Browse', ariaLabel: 'Serach Assets' },
-        { label: 'Collections', ariaLabel: 'Saved Assets' },
+        { label: 'Home', ariaLabel: 'Home', to: '/' },
+        { label: 'Browse', ariaLabel: 'Search Assets', to: '/browse' },
+        { label: 'Collections', ariaLabel: 'Saved Assets', to: '/collection' },
       ],
     },
     {
-      label: 'Projects',
+      label: 'Explore',
       links: [
-        { label: 'Featured', ariaLabel: 'Featured Projects' },
-        { label: 'Case Studies', ariaLabel: 'Project Case Studies' },
+        { label: 'Go Home', ariaLabel: 'Navigate to Home', to: '/' },
+        { label: 'Open Gallery', ariaLabel: 'Navigate to Browse', to: '/browse' },
       ],
     },
     {
-      label: 'Contact',
+      label: 'Library',
       links: [
-        { label: 'Email', ariaLabel: 'Email us' },
-        { label: 'Twitter', ariaLabel: 'Twitter' },
-        { label: 'LinkedIn', ariaLabel: 'LinkedIn' },
+        { label: 'Saved Items', ariaLabel: 'Navigate to Collections', to: '/collection' },
+        { label: 'Browse More', ariaLabel: 'Navigate to Browse', to: '/browse' },
       ],
     },
   ];
@@ -201,10 +201,23 @@ const CardNav = () => {
 
               <div className='nav-card-links'>
                 {item.links?.map((lnk, i) => (
-                  <a key={`${lnk.label}-${i}`} className='nav-card-link' href={lnk.href} aria-label={lnk.ariaLabel}>
+                  <NavLink
+                    key={`${lnk.label}-${i}`}
+                    className='nav-card-link'
+                    to={lnk.to}
+                    aria-label={lnk.ariaLabel}
+                    onClick={() => {
+                      if (!isExpanded) return;
+                      setIsHamburgerOpen(false);
+                      const tl = tlRef.current;
+                      if (!tl) return;
+                      tl.eventCallback('onReverseComplete', () => setIsExpanded(false));
+                      tl.reverse();
+                    }}
+                  >
                     <GoArrowUpRight className='nav-card-link-icon' aria-hidden='true' />
                     {lnk.label}
-                  </a>
+                  </NavLink>
                 ))}
               </div>
             </div>

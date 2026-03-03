@@ -1,6 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import Button from './Button';
 import { useNavigate } from 'react-router-dom';
+import { useSelector,useDispatch } from 'react-redux';
+import { addCollection } from '../redux/features/collectionSlice';
+import { toast } from 'react-toastify';
 
 const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
   const navigate = useNavigate();
@@ -9,13 +12,22 @@ const ResultCard = ({ elem, isLoading = false, heightClass = 'h-[280px]' }) => {
   const mediaTypeLabel = elem.type === 'photo' ? 'img' : elem.type || 'img';
   const loadingClass = isLoading ? 'animate-pulse' : '';
 
+  const dispatch = useDispatch();
+  const collectionItems = useSelector((state) => state.collections.items);
+
   const addToCollection = (item) => {
-    const oldData = JSON.parse(localStorage.getItem('collections')) || [];
-    const isDuplicate = oldData.some(
-      (collectionItem) => collectionItem?.id === item?.id && collectionItem?.src === item?.src
+    const isDuplicate = (collectionItems || []).some(
+      (collectionItem) =>
+        String(collectionItem?.id) === String(item?.id) && collectionItem?.src === item?.src
     );
-    const newData = isDuplicate ? oldData : [...oldData, item];
-    localStorage.setItem('collections', JSON.stringify(newData));
+
+    if (isDuplicate) {
+      toast.warning('Already in collection');
+      return;
+    }
+
+    dispatch(addCollection(item));
+    toast.success('Added to collection');
   };
 
   // This might work good but to inhance user experience to a very convenient level i have

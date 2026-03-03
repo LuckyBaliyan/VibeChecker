@@ -4,6 +4,8 @@ import { gsap } from 'gsap';
 import { FiArrowRight, FiBookmark, FiCompass, FiFolder, FiGithub, FiHeart } from 'react-icons/fi';
 import { AiFillThunderbolt } from 'react-icons/ai';
 
+const REPO_URL = 'https://github.com/LuckyBaliyan/VibeChecker';
+
 const Home = () => {
   const navigate = useNavigate();
   const gridRef = useRef(null);
@@ -48,29 +50,47 @@ const Home = () => {
             <p>Explore curated inspiration</p>
           </button>
 
-          <article className='home-tile tile-collections'>
+          <button
+            className='home-tile tile-collections'
+            onClick={() => navigate('/collection', { state: { source: 'saved' } })}
+            type='button'
+          >
             <FiFolder className='tile-icon' />
             <h2>Collections</h2>
             <p>View your boards</p>
-          </article>
+          </button>
 
-          <article className='home-tile tile-saved'>
+          <button
+            className='home-tile tile-saved'
+            onClick={() => navigate('/collection', { state: { source: 'saved' } })}
+            type='button'
+          >
             <FiBookmark className='tile-icon' />
             <h2>Saved</h2>
             <p>Bookmarked pins</p>
-          </article>
+          </button>
 
-          <article className='home-tile tile-liked'>
+          <button
+            className='home-tile tile-liked'
+            onClick={() => navigate('/collection', { state: { source: 'liked' } })}
+            type='button'
+          >
             <FiHeart className='tile-icon' />
             <h2>Liked</h2>
             <p>Your favorites</p>
-          </article>
+          </button>
 
-          <article className='home-tile tile-github'>
+          <a
+            className='home-tile tile-github'
+            href={REPO_URL}
+            target='_blank'
+            rel='noreferrer'
+            aria-label='Open project repository'
+          >
             <FiGithub className='tile-icon' />
             <h2>GitHub</h2>
             <p>View source code</p>
-          </article>
+          </a>
 
           <button className='home-tile tile-explore' onClick={() => navigate('/browse')} type='button'>
             <FiCompass className='tile-icon' />
