@@ -57,6 +57,88 @@ const getHeightClass = (index, item) => {
   return bentoHeights[hashed % bentoHeights.length];
 };
 
+const CollectionMediaCard = ({ item, index, cardClass, onRemove, onOpen }) => {
+  const [isMediaLoaded, setIsMediaLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsMediaLoaded(false);
+  }, [item?.id, item?.src, item?.thumbnail]);
+
+  const mediaKind = getMediaKind(item);
+  const isVideo = mediaKind === 'video' || mediaKind === 'gif';
+  const thumb = item?.thumbnail || item?.src;
+  const title = item?.title || 'Untitled';
+  const heightClass = getHeightClass(index, item);
+
+  return (
+    <article
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      role='button'
+      tabIndex={0}
+      className={`group mb-3 break-inside-avoid overflow-hidden rounded-2xl transition-all sm:mb-4 lg:mb-5 ${cardClass}`}
+    >
+      <div className={`relative w-full overflow-hidden ${heightClass} blur-load ${isMediaLoaded ? 'loaded' : ''}`}>
+        {isVideo ? (
+          <video
+            src={item?.src}
+            poster={item?.thumbnail}
+            className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
+            muted
+            autoPlay
+            loop
+            playsInline
+            onLoadedData={() => setIsMediaLoaded(true)}
+            onCanPlayThrough={() => setIsMediaLoaded(true)}
+            onError={() => setIsMediaLoaded(true)}
+          />
+        ) : (
+          <img
+            src={thumb}
+            alt={title}
+            className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
+            loading='lazy'
+            onLoad={() => setIsMediaLoaded(true)}
+            onError={() => setIsMediaLoaded(true)}
+          />
+        )}
+
+        <span className='card-loader' aria-hidden='true' />
+
+        <div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+          <p className='line-clamp-2 text-xs font-medium text-white'>{title}</p>
+          <div className='mt-2 flex items-center gap-2'>
+            <a
+              href={item?.src}
+              target='_blank'
+              rel='noreferrer'
+              onClick={(e) => e.stopPropagation()}
+              className='inline-flex rounded-full border border-[#ef3f73] bg-[#ef3f73] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white'
+            >
+              Source
+            </a>
+            <button
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className='inline-flex rounded-full border border-white/70 bg-black/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:border-[#ff6c93] hover:text-[#ff8cab]'
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
 const Collection = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -197,71 +279,15 @@ const Collection = () => {
           ) : (
             <div className='columns-1 gap-3 space-y-3 sm:columns-2 sm:gap-4 sm:space-y-4 lg:columns-3 lg:gap-5 lg:space-y-5'>
               {bentoItems.map((item, index) => {
-                const mediaKind = getMediaKind(item);
-                const isVideo = mediaKind === 'video' || mediaKind === 'gif';
-                const thumb = item?.thumbnail || item?.src;
-                const title = item?.title || 'Untitled';
-
                 return (
-                  <article
+                  <CollectionMediaCard
                     key={`${item?.id || 'item'}-${index}`}
-                    onClick={() => navigate(`/media/${encodeURIComponent(item?.id || 'preview')}`, { state: { item } })}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        navigate(`/media/${encodeURIComponent(item?.id || 'preview')}`, { state: { item } });
-                      }
-                    }}
-                    role='button'
-                    tabIndex={0}
-                    className={`group mb-3 break-inside-avoid overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,0,0,0.18)] sm:mb-4 lg:mb-5 ${cardClass}`}
-                  >
-                    <div className={`relative w-full overflow-hidden ${getHeightClass(index, item)}`}>
-                      {isVideo ? (
-                        <video
-                          src={item?.src}
-                          poster={item?.thumbnail}
-                          className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
-                          muted
-                          autoPlay
-                          loop
-                          playsInline
-                        />
-                      ) : (
-                        <img
-                          src={thumb}
-                          alt={title}
-                          className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]'
-                          loading='lazy'
-                        />
-                      )}
-
-                      <div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-                        <p className='line-clamp-2 text-xs font-medium text-white'>{title}</p>
-                        <div className='mt-2 flex items-center gap-2'>
-                          <a
-                            href={item?.src}
-                            target='_blank'
-                            rel='noreferrer'
-                            onClick={(e) => e.stopPropagation()}
-                            className='inline-flex rounded-full border border-[#ef3f73] bg-[#ef3f73] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white'
-                          >
-                            Source
-                          </a>
-                          <button
-                            type='button'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemove(item);
-                            }}
-                            className='inline-flex rounded-full border border-white/70 bg-black/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:border-[#ff6c93] hover:text-[#ff8cab]'
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
+                    item={item}
+                    index={index}
+                    cardClass={cardClass}
+                    onOpen={() => navigate(`/media/${encodeURIComponent(item?.id || 'preview')}`, { state: { item } })}
+                    onRemove={() => handleRemove(item)}
+                  />
                 );
               })}
             </div>
