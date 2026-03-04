@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { fetchAssets, fetchVideos, fetchGifs } from '../api/mediaApi';
-import { setLoading, setError, setResults, clearResults, setQuery, setActiveTab } from '../redux/features/searchSlice';
+import React, { useEffect, useState } from 'react';
+import { skipToken } from '@reduxjs/toolkit/query';
+import { setQuery, setActiveTab } from '../redux/features/searchSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ResultCard from './ResultCard';
 import Button from './Button';
-import { skel } from '../hooks/handleRender';
 import { FiUser } from 'react-icons/fi';
 import { AiFillThunderbolt } from 'react-icons/ai';
+import { useGetPhotosQuery, useGetGifsQuery, useGetVideosQuery } from '../redux/queries/apiSlice';
 
 const tabs = [
   { label: 'IMAGES', value: 'photos' },
@@ -45,16 +45,29 @@ const getHeightClass = (index, item) => {
 };
 
 const ResultGrid = () => {
-  const { query, activeTab, results, loading, error } = useSelector((store) => store.search);
+  const { query, activeTab } = useSelector((store) => store.search);
   const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState(query);
   const [isDark, setIsDark] = useState(() => localStorage.getItem('themeMode') === 'dark');
-  const requestRef = useRef(0);
+  const trimmedQuery = query.trim();
+  const hasQuery = trimmedQuery.length > 0;
 
-  //Optimiszed rendering fetaure 
-  useEffect(()=>{
-    skel();
-  },[results]);
+  const photosQuery = useGetPhotosQuery(hasQuery && activeTab === 'photos' ? trimmedQuery : skipToken);
+  const gifsQuery = useGetGifsQuery(hasQuery && activeTab === 'gifs' ? trimmedQuery : skipToken);
+  const videosQuery = useGetVideosQuery(hasQuery && activeTab === 'videos' ? trimmedQuery : skipToken);
+
+  const activeQueryState =
+    activeTab === 'photos' ? photosQuery : activeTab === 'gifs' ? gifsQuery : videosQuery;
+
+  const results = activeQueryState.data || [];
+  const loading = activeQueryState.isFetching;
+  const error = activeQueryState.error;
+
+  const errorMessage = error
+    ? typeof error?.data === 'string'
+      ? error.data
+      : error?.data?.message || error?.error || 'Network error. Try again.'
+    : null;
 
   useEffect(() => {
     setSearchValue(query);
@@ -75,48 +88,6 @@ const ResultGrid = () => {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    const requestId = ++requestRef.current;
-
-    const getData = async () => {
-      const trimmedQuery = query.trim();
-
-      if (!trimmedQuery) {
-        dispatch(clearResults());
-        dispatch(setLoading(false));
-        return;
-      }
-
-      dispatch(setLoading(true));
-
-      try {
-        let finalData = [];
-
-        if (activeTab === 'photos') {
-          finalData = await fetchAssets(trimmedQuery);
-        } else if (activeTab === 'videos') {
-          finalData = await fetchVideos(trimmedQuery);
-        } else if (activeTab === 'gifs') {
-          finalData = await fetchGifs(trimmedQuery);
-        }
-
-        if (cancelled || requestId !== requestRef.current) return;
-        dispatch(setResults(finalData));
-        dispatch(setLoading(false));
-      } catch (err) {
-        if (cancelled || requestId !== requestRef.current) return;
-        dispatch(setError(err.message || 'Network error. Try again.'));
-      }
-    };
-
-    getData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [query, activeTab, dispatch]);
-
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(setQuery(searchValue.trim()));
@@ -127,7 +98,6 @@ const ResultGrid = () => {
     dispatch(setQuery(topic));
   };
 
-  const hasQuery = query.trim().length > 0;
   const pageBgClass = isDark ? 'bg-[#0f1219]' : 'bg-[#f0f0f3]';
   const layerBgClass = isDark ? 'bg-[#0f1219]/95 border-[#222736]' : 'bg-[#f0f0f3]/95 border-[#e8e8ee]';
   const searchBgClass = isDark ? 'bg-[#161b27] text-zinc-100 placeholder:text-zinc-400' : 'bg-white text-[#171a24] placeholder:text-[#a3a7b2]';
@@ -207,13 +177,13 @@ const ResultGrid = () => {
       <div className='mx-auto w-full max-w-[1320px]'>
         <div className='pt-[136px] sm:pt-[144px]'>
 
-          {error && (
+          {errorMessage && (
             <p className='mx-auto mt-8 max-w-2xl rounded-xl border border-red-400/70 bg-red-100 px-4 py-3 text-center text-sm text-red-700'>
-              {error}
+              {errorMessage}
             </p>
           )}
 
-          {!loading && !error && !hasQuery && (
+          {!loading && !errorMessage && !hasQuery && (
             <div className={`mx-auto mt-10 max-w-2xl rounded-2xl border p-6 text-center ${isDark ? 'border-[#2a3042] bg-[#141a27]' : 'border-[#e3e4eb] bg-white'}`}>
               <p className={`text-sm font-medium ${isDark ? 'text-zinc-300' : 'text-[#4d5568]'}`}>
                 Start with a topic to load media.
@@ -240,7 +210,7 @@ const ResultGrid = () => {
             </div>
           )}
 
-          {!loading && !error && hasQuery && results.length === 0 && (
+          {!loading && !errorMessage && hasQuery && results.length === 0 && (
             <p className={`mt-8 text-center text-sm ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>No results found for this query.</p>
           )}
 

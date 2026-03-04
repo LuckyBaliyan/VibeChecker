@@ -4,6 +4,19 @@
 :root {
   --accent: #7a5cff;
   --accent-rgb: 122, 92, 255;
+  --result-card-bg: #ececef;
+  --card-loader-bg: #e7e8eb;
+  --card-loader-layer: rgba(0, 0, 0, 0.05);
+  --card-loader-ring: rgba(239, 63, 115, 0.9);
+  --card-loader-ring-muted: rgba(239, 63, 115, 0.2);
+}
+
+html[data-theme='dark'] {
+  --result-card-bg: #0c0d10;
+  --card-loader-bg: #000000b5;
+  --card-loader-layer: rgba(255, 255, 255, 0.04);
+  --card-loader-ring: rgba(239, 124, 160, 0.96);
+  --card-loader-ring-muted: rgba(239, 124, 160, 0.24);
 }
 
 html[data-accent='mint'] {
@@ -414,8 +427,12 @@ body {
 
 /* Handling optimistic images preloading */
 
+.result-card-surface {
+  background-color: var(--result-card-bg);
+}
+
 .blur-load{
-  background-image: url('/PlaceHolder-1.jpg');
+  background-color: var(--card-loader-bg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -438,29 +455,45 @@ body {
 }
 */
 
-.blur-load::before{
-  content: "";
+.blur-load::before {
+  content: '';
   position: absolute;
   inset: 0;
-  animation: pluse 2.5s infinite;
-  background-color: rgba(255, 255, 255, .1);
+  z-index: 1;
+  background: linear-gradient(var(--card-loader-layer), var(--card-loader-layer));
 }
 
-@keyframes pluse {
-  0%{
-    background-color: rgb(255, 255, 255, 0);
-  }
-  50%{
-    background-color: rgb(255, 255, 255, .2);
-  }
-  100%{
-    background-color: rgb(255, 255, 255, 0);
+.card-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: 2px solid var(--card-loader-ring-muted);
+  border-top-color: var(--card-loader-ring);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  opacity: 0.92;
+  animation: card-loader-spin 0.9s linear infinite;
+}
+
+@keyframes card-loader-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
 .blur-load.loaded::before{
-  content: none;
+  opacity: 0;
   animation: none;
+  transition: opacity 260ms ease;
+}
+
+.blur-load.loaded .card-loader {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
 }
 
 .blur-load.loaded > img,
@@ -471,7 +504,13 @@ body {
 .blur-load > img,
 .blur-load > video {
   opacity: 0;
-  transition: opacity 200ms ease-in-out;
+  transition: opacity 420ms ease, transform 420ms ease;
+  transform: scale(1.02);
+}
+
+.blur-load.loaded > img,
+.blur-load.loaded > video {
+  transform: scale(1);
 }
 
 .pinspire-home {
