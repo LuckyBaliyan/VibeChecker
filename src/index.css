@@ -461,6 +461,7 @@ body {
   inset: 0;
   z-index: 1;
   background: linear-gradient(var(--card-loader-layer), var(--card-loader-layer));
+  pointer-events: none;
 }
 
 .card-loader {
@@ -476,6 +477,7 @@ body {
   z-index: 2;
   opacity: 0.92;
   animation: card-loader-spin 0.9s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes card-loader-spin {
