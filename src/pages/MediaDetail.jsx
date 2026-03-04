@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { skipToken } from '@reduxjs/toolkit/query';
 import Button from '../components/Button';
 import { HiHeart, HiOutlineHeart } from 'react-icons/hi2';
 import { FiExternalLink, FiLink2, FiShare2 } from 'react-icons/fi';
@@ -9,6 +10,7 @@ import { toggleLikes } from '../redux/features/likeSlice';
 import { addCollection } from '../redux/features/collectionSlice';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useGetPhotosQuery, useGetGifsQuery, useGetVideosQuery } from '../redux/queries/apiSlice';
 
 
 const MediaDetail = () => {
@@ -85,28 +87,35 @@ const MediaDetail = () => {
     return 'photo';
   };
 
-  const relatedPool = useMemo(() => {
-    const merged = [...(results || []), ...(collectionItems || []), ...(likedItems || [])];
-    const uniqueMap = new Map();
+  const relatedSearchTerm = useMemo(() => {
+    const raw = String(currentItem?.title || '').trim();
+    if (raw) return raw.split('|')[0].trim();
+    return 'nature';
+  }, [currentItem?.title]);
 
-    merged.forEach((item) => {
-      const key = `${String(item?.id || '')}-${String(item?.src || '')}`;
-      if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, item);
-      }
-    });
+  const photosQuery = useGetPhotosQuery(
+    currentItem && relatedType === 'photo' ? relatedSearchTerm : skipToken
+  );
+  const gifsQuery = useGetGifsQuery(
+    currentItem && relatedType === 'gif' ? relatedSearchTerm : skipToken
+  );
+  const videosQuery = useGetVideosQuery(
+    currentItem && relatedType === 'video' ? relatedSearchTerm : skipToken
+  );
 
-    return Array.from(uniqueMap.values());
-  }, [results, collectionItems, likedItems]);
+  const relatedQueryState =
+    relatedType === 'photo' ? photosQuery : relatedType === 'gif' ? gifsQuery : videosQuery;
+
+  const relatedApiItems = relatedQueryState.data || [];
 
   const relatedContent = useMemo(() => {
     if (!currentItem) return [];
 
-    return relatedPool
+    return relatedApiItems
       .filter((item) => getMediaKind(item) === relatedType)
       .filter((item) => !(String(item?.id) === String(currentItem.id) && item?.src === currentItem.src))
       .slice(0, 8);
-  }, [currentItem, relatedType, relatedPool]);
+  }, [currentItem, relatedType, relatedApiItems]);
 
   const addToCollection = () => {
     if (!currentItem) return;
